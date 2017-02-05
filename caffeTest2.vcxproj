@@ -74,8 +74,8 @@
     <LibraryPath>D:\caffe\build\libraries\x64\vc12\lib;D:\caffe\build\libraries\lib;D:\caffe\build\install\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <IncludePath>D:\caffe\build\libraries\include\boost-1_61;D:\caffe\build\libraries\include;D:\caffe\build\install\include;$(IncludePath)</IncludePath>
-    <LibraryPath>D:\caffe\build\libraries\x64\vc12\lib;D:\caffe\build\libraries\lib;D:\caffe\build\install\lib;$(LibraryPath)</LibraryPath>
+    <IncludePath>C:\Qt\Qt5.6.1\5.6\msvc2013_64\include;D:\caffe\build\libraries\include\boost-1_61;D:\caffe\build\libraries\include;D:\caffe\build\install\include;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\Qt\Qt5.6.1\5.6\msvc2013_64\lib;D:\caffe\build\libraries\x64\vc12\lib;D:\caffe\build\libraries\lib;D:\caffe\build\install\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -123,7 +123,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalDependencies>caffe.lib;proto.lib;boost_system-vc120-mt-1_61.lib;boost_thread-vc120-mt-1_61.lib;boost_filesystem-vc120-mt-1_61.lib;boost_chrono-vc120-mt-1_61.lib;boost_date_time-vc120-mt-1_61.lib;boost_atomic-vc120-mt-1_61.lib;glog.lib;gflags.lib;shlwapi.lib;libprotobuf.lib;caffehdf5_hl.lib;caffehdf5.lib;caffezlib.lib;lmdb.lib;ntdll.lib;leveldb.lib;snappy_static.lib;opencv_highgui310.lib;opencv_imgcodecs310.lib;opencv_imgproc310.lib;opencv_core310.lib;libopenblas.dll.a;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>Qt5Gui.lib;Qt5Core.lib;qtmain.lib;caffe.lib;proto.lib;boost_system-vc120-mt-1_61.lib;boost_thread-vc120-mt-1_61.lib;boost_filesystem-vc120-mt-1_61.lib;boost_chrono-vc120-mt-1_61.lib;boost_date_time-vc120-mt-1_61.lib;boost_atomic-vc120-mt-1_61.lib;glog.lib;gflags.lib;shlwapi.lib;libprotobuf.lib;caffehdf5_hl.lib;caffehdf5.lib;caffezlib.lib;lmdb.lib;ntdll.lib;leveldb.lib;snappy_static.lib;opencv_highgui310.lib;opencv_imgcodecs310.lib;opencv_imgproc310.lib;opencv_core310.lib;libopenblas.dll.a;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
