@@ -2,7 +2,16 @@
 #include <fstream>
 #include <iterator>
 #include <string>
+
+//MSVC
+#ifdef _WIN32
 #include <direct.h>
+#else
+#include <sys/stat.h>
+#include <unistd.h>
+#define _chdir(x) chdir(x)
+#define _mkdir(x) mkdir(x,0777)
+#endif
 
 #define CPU_ONLY
 #define OUTSIDE_TEST
@@ -15,8 +24,6 @@
 #include <opencv2/imgproc/imgproc.hpp>
 
 #include <QtGui\QImage>
-#include <QtCore\QFile>
-
 
 using namespace caffe;  // NOLINT(build/namespaces)
 using namespace cv;
@@ -43,20 +50,23 @@ private:
 	std::vector<float> Predict(const QImage& img);
 
 	void WrapInputLayer(std::vector<cv::Mat>* input_channels);
-	void WrapInputLayer(std::vector<QImage>* input_channels);
+	void WrapInputLayer(std::vector<QImage> input_channels);
 
 	void Preprocess(const cv::Mat& img , std::vector<cv::Mat>* input_channels);
-	void Preprocess(const QImage& img, std::vector<QImage>* input_channels);
+	void Preprocess(const QImage& img, std::vector<QImage> input_channels);
 
 private:
 	shared_ptr<Net<float> > net_;
+	int num_channels_;
+	std::vector<string> labels_; 
 
-
+	int input_height_;
+	int input_width_;
+	QImage mean__;
 
 	cv::Size input_geometry_;
-	int num_channels_;
 	cv::Mat mean_;
-	std::vector<string> labels_; 
+
 };
 
 Classifier::Classifier(const string& model_file,
@@ -82,6 +92,8 @@ Classifier::Classifier(const string& model_file,
 	CHECK(num_channels_ == 3 || num_channels_ == 1)
 		<< "Input layer should have 1 or 3 channels.";
 	input_geometry_ = cv::Size(input_layer->width(), input_layer->height());
+	input_height_ = input_layer->height();
+	input_width_  = input_layer->width();
 
 	/* Load the binaryproto mean file. */
 	SetMean(mean_file);
@@ -150,32 +162,35 @@ void Classifier::SetMean(const string& mean_file) {
 		channels.push_back(channel);
 		data += mean_blob.height() * mean_blob.width();
 	}
+	
 
-	/*float* meanImage;
-	meanImage = new float[ num_channels2 * mean_blob.height() * mean_blob.width()];
 	float* data2 = mean_blob.mutable_cpu_data();
 	float meandata[3] = {0,0,0};
-	for (int i = 0; i < num_channels2 * mean_blob.height() * mean_blob.width(); i++, data2++)
+
+	float* meanImage;
+	meanImage = new float[num_channels_*mean_blob.height() * mean_blob.width()];
+	for (int i = 0; i < num_channels_ * mean_blob.height() * mean_blob.width(); i++, data2++)
 	{
 		meanImage[i] = *data2;
-		meandata[i / mean_blob.height()*mean_blob.width()] += *data2;
+		meandata[i / (mean_blob.height() * mean_blob.width())] += *data2;
 	}
 
-	for (int i = 0; i < num_channels2; i++)
+	for (int i = 0; i < num_channels_; i++)
 	{
-		meandata[i] /= mean_blob.height()*mean_blob.width();
+		meandata[i] /= (mean_blob.height()*mean_blob.width());
 	}
 
-	if (num_channels2 == 3)
+	mean__ = QImage(mean_blob.width(), mean_blob.height(), QImage::Format_RGB32);
+	if (num_channels_ == 3)
 	{
 		QColor temp(meandata[0], meandata[1], meandata[2]);
-		mean2.fill(temp);
+		mean__.fill(temp);
 	}
 	else
 	{
-		QColor temp(meandata[0]);
-		mean2.fill(temp);
-	}*/
+		QColor temp(meandata[0], meandata[0], meandata[0]);
+		mean__.fill(temp);
+	}
 	
 
 	/* Merge the separate channels into a single image. */
@@ -186,9 +201,8 @@ void Classifier::SetMean(const string& mean_file) {
 	* filled with this value. */
 	cv::Scalar channel_mean = cv::mean(mean);
 	mean_ = cv::Mat(input_geometry_, mean.type(), channel_mean);
-
 	cv::imwrite("meanfileCV.png", mean_);
-	//mean2.save("meanfileQT.png");
+	mean__.save("meanfileQT.png");
 }
 
 
@@ -274,14 +288,14 @@ void Classifier::Preprocess(const cv::Mat& img,
 
 int startImg = 1;
 int endImg = 22;
-int maskHeight = 29;
+int maskHeight = 47;
 
 int main()
 {
 	int i, j, m;
 
 	string modelType = std::to_string(maskHeight);
-	modelType += "_SubMean";
+	modelType += "_SubMean_padding";
 
 	string trained_filename = "model_" + modelType + "/deploy.prototxt";
 	string mean_filename = "model_" + modelType + "/mean.binaryproto";
